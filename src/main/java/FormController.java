@@ -24,19 +24,17 @@ public class FormController extends HttpServlet {
         resp.setStatus(200);
 
         PrintWriter out = resp.getWriter();
-        resp.setContentType("text/plain");
+        resp.setContentType("text");
 
-        // Get the values of all request parameters
+
         Enumeration en = req.getParameterNames();
         while(en.hasMoreElements()) {
-            // Get the name of the request parameter
+
             String name = (String)en.nextElement();
             out.println(name);
 
-            // Get the value of the request parameter
             String value = req.getParameter(name);
 
-            // If the request parameter can appear more than once in the query string, get all values
             String[] values = req.getParameterValues(name);
 
             for (int i=0; i<values.length; i++) {
