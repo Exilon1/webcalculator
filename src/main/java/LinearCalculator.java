@@ -1,52 +1,56 @@
+package main.java;
+
 import exceptions.DivisionByZeroException;
 import exceptions.ExceptionOfEverything;
 import exceptions.ParamNumberOfBoundException;
 import exceptions.UnacceptableSymbolsException;
+import jdbc.JdbcCrud;
 
-import java.util.Scanner;
+import java.sql.ResultSet;
+
 
 /**
  * Created by Alexey on 27.10.2016.
  */
 public class LinearCalculator {
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Good evening, professor!\n" +
-                "What would you like to calculate?\n" +
-                "(if you don't know to do use command help)");
-     //   System.out.println(Float.valueOf("sum"));
-        String comand;
-        while(scanner.hasNext()) {
-            comand = scanner.nextLine();
-            comand = comand.trim();
 
-            if(comand.equals("help"))
-                System.out.println("you have access to the command\n" +
-                        "a+b\n" +
-                        "a-b\n" +
-                        "a*b\n" +
-                        "a/b\n");
-            float c;
-            try {
-                try {
-                    c = parseAndCalc(comand);
-                    System.out.println("Result: " + c);
-                } catch (ParamNumberOfBoundException | UnacceptableSymbolsException | DivisionByZeroException e) {
-                    System.out.println(e.getMessage());
-                }
-            } catch (ExceptionOfEverything e) {
-                System.out.println(e.getMessage());
-            }
-        }
+
+    private LinearCalculator() {
+    }
+
+    private static class SingletonHelper {
+        private static final LinearCalculator SINGLETON = new LinearCalculator();
+    }
+
+    public static LinearCalculator getInstance() {
+        return LinearCalculator.SingletonHelper.SINGLETON;
     }
 
 
-    private static float parseAndCalc(String comand) throws ExceptionOfEverything {
+    private JdbcCrud repo;
+
+    public void inicializeCrud() {
+        if (repo==null) {
+            repo = JdbcCrud.getInstance();
+            repo.connect("h2Connection");
+        }
+    }
+
+    public void putIntoDatabase(String data) {
+        repo.update(data);
+    }
+
+    public ResultSet selectFromResults() {
+        return repo.read();
+    }
+
+    public static float parseAndCalc(String comand) throws ExceptionOfEverything {
         String[] c;
         float a;
         float b;
 
+        comand = comand.trim();
         try {
             if(comand.lastIndexOf('+') != -1) {
                 c = comand.split("\\+");
